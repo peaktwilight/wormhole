@@ -14,6 +14,7 @@
     "test": "npm run --prefix=../sdk/js build-lib && ts-node test/test.ts"
   },
   "overrides": {
-    "elliptic": "^6.6.1"
+    "elliptic": "^6.6.1",
+    "diff": "4.0.4"
   }
 }
