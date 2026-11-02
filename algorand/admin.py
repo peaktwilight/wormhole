@@ -56,8 +56,6 @@ class Account:
     def __init__(self, privateKey: str) -> None:
         self.sk = privateKey
         self.addr = account.address_from_private_key(privateKey)
-        print (privateKey)
-        print ("    " + self.getMnemonic())
         print ("    " + self.addr)
 
     def getAddress(self) -> str:
