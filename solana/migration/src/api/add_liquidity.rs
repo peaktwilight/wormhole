@@ -12,7 +12,7 @@ use crate::{
         SplAccount,
         SplMint,
     },
-    MigrationError::WrongMint,
+    MigrationError::{WrongMint, WrongOwner},
 };
 use borsh::{
     BorshDeserialize,
@@ -30,6 +30,7 @@ pub struct AddLiquidity<'b> {
     pub to_token_custody: Mut<ToCustodyTokenAccount<'b, { AccountState::Initialized }>>,
     pub share_mint: Mut<ShareMint<'b, { AccountState::Initialized }>>,
 
+    pub user_authority: Signer<Info<'b>>,
     pub to_lp_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub lp_share_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub custody_signer: CustodySigner<'b>,
@@ -54,6 +55,11 @@ pub fn add_liquidity(
     }
     if accs.lp_share_acc.mint != *accs.share_mint.info().key {
         return Err(WrongMint.into());
+    }
+    if accs.to_lp_acc.owner != *accs.user_authority.key
+        || accs.lp_share_acc.owner != *accs.user_authority.key
+    {
+        return Err(WrongOwner.into());
     }
     accs.to_token_custody.verify_derivation(
         ctx.program_id,

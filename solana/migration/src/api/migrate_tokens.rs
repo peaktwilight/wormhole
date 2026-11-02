@@ -12,7 +12,7 @@ use crate::{
         SplAccount,
         SplMint,
     },
-    MigrationError::WrongMint,
+    MigrationError::{WrongMint, WrongOwner},
 };
 use borsh::{
     BorshDeserialize,
@@ -36,6 +36,7 @@ pub struct MigrateTokens<'b> {
     pub to_token_custody: Mut<ToCustodyTokenAccount<'b, { AccountState::Initialized }>>,
     pub from_token_custody: Mut<FromCustodyTokenAccount<'b, { AccountState::Initialized }>>,
 
+    pub user_authority: Signer<Info<'b>>,
     pub user_from_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub user_to_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub custody_signer: CustodySigner<'b>,
@@ -63,6 +64,11 @@ pub fn migrate_tokens(
     }
     if accs.user_to_acc.mint != accs.pool.to {
         return Err(WrongMint.into());
+    }
+    if accs.user_from_acc.owner != *accs.user_authority.key
+        || accs.user_to_acc.owner != *accs.user_authority.key
+    {
+        return Err(WrongOwner.into());
     }
     accs.to_token_custody.verify_derivation(
         ctx.program_id,

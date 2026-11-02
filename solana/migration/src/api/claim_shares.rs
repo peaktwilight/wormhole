@@ -9,7 +9,7 @@ use crate::{
         ToCustodyTokenAccount,
     },
     types::SplAccount,
-    MigrationError::WrongMint,
+    MigrationError::{WrongMint, WrongOwner},
 };
 use borsh::{
     BorshDeserialize,
@@ -31,6 +31,7 @@ pub struct ClaimShares<'b> {
     pub from_token_custody: Mut<ToCustodyTokenAccount<'b, { AccountState::Initialized }>>,
     pub share_mint: Mut<ShareMint<'b, { AccountState::Initialized }>>,
 
+    pub user_authority: Signer<Info<'b>>,
     pub from_lp_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub lp_share_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub custody_signer: CustodySigner<'b>,
