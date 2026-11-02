@@ -96,6 +96,7 @@ import (
 	"github.com/tendermint/spm/openapiconsole"
 
 	"github.com/wormhole-foundation/wormchain/docs"
+	wasm_handlers "github.com/wormhole-foundation/wormchain/app/wasm_handlers"
 	wormholemodule "github.com/wormhole-foundation/wormchain/x/wormhole"
 	wormholemoduleante "github.com/wormhole-foundation/wormchain/x/wormhole/ante"
 	wormholeclient "github.com/wormhole-foundation/wormchain/x/wormhole/client"
@@ -455,14 +456,17 @@ func New(
 		appCodec,
 		keys[wasm.StoreKey],
 		app.GetSubspace(wasm.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-		app.StakingKeeper,
-		app.DistrKeeper,
-		app.IBCKeeper.ChannelKeeper,
-		&app.IBCKeeper.PortKeeper,
-		app.scopedWasmKeeper,
-		app.TransferKeeper,
+		&wasm_handlers.AccountKeeperHandler{AccountKeeper: app.AccountKeeper},
+		&wasm_handlers.BankKeeperHandler{
+			BankViewKeeperHandler: wasm_handlers.BankViewKeeperHandler{Keeper: app.BankKeeper},
+			BurnerHandler:         wasm_handlers.BurnerHandler{Keeper: app.BankKeeper},
+		},
+		&wasm_handlers.StakingKeeperHandler{Keeper: app.StakingKeeper},
+		&wasm_handlers.DistributionKeeperHandler{Keeper: app.DistrKeeper},
+		&wasm_handlers.ChannelKeeperHandler{Keeper: app.IBCKeeper.ChannelKeeper},
+		&wasm_handlers.PortKeeperHandler{Keeper: app.IBCKeeper.PortKeeper},
+		&wasm_handlers.CapabilityKeeperHandler{ScopedKeeper: app.scopedWasmKeeper},
+		&wasm_handlers.ICS20TransferPortSourceHandler{Keeper: app.TransferKeeper},
 		app.WormholeKeeper,
 		app.MsgServiceRouter(),
 		app.GRPCQueryRouter(),
