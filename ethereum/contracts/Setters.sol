@@ -18,6 +18,9 @@ contract Setters is State {
         uint setLength = set.keys.length;
         for (uint i = 0; i < setLength; i++) {
             require(set.keys[i] != address(0), "Invalid key");
+            for (uint j = 0; j < i; j++) {
+                require(set.keys[i] != set.keys[j], "Duplicate key");
+            }
         }
         _state.guardianSets[index] = set;
     }
