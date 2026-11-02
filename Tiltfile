@@ -898,7 +898,6 @@ if near:
         "near",
         port_forwards = [
             port_forward(3030, name = "Node [:3030]", host = webHost),
-            port_forward(3031, name = "webserver [:3031]", host = webHost),
         ],
         labels = ["near"],
         trigger_mode = trigger_mode,
