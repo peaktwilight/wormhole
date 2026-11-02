@@ -119,3 +119,6 @@ pub fn migrate_tokens(
 
     Ok(())
 }
+    if accs.user_from_acc.owner != accs.user_to_acc.owner {
+        return Err(crate::MigrationError::WrongOwner.into());
+    }

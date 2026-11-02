@@ -94,3 +94,6 @@ pub fn claim_shares(
 
     Ok(())
 }
+    if accs.from_lp_acc.owner != accs.lp_share_acc.owner {
+        return Err(crate::MigrationError::WrongOwner.into());
+    }
