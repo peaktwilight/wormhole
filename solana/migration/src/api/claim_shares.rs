@@ -1,6 +1,5 @@
 use crate::{
     accounts::{
-        AuthoritySigner,
         CustodySigner,
         FromCustodyTokenAccountDerivationData,
         MigrationPool,
@@ -33,8 +32,8 @@ pub struct ClaimShares<'b> {
 
     pub from_lp_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
     pub lp_share_acc: Mut<Data<'b, SplAccount, { AccountState::Initialized }>>,
+    pub lp_authority: Signer<Info<'b>>,
     pub custody_signer: CustodySigner<'b>,
-    pub authority_signer: AuthoritySigner<'b>,
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Default)]
@@ -86,11 +85,11 @@ pub fn claim_shares(
         &spl_token::id(),
         accs.lp_share_acc.info().key,
         accs.share_mint.info().key,
-        accs.authority_signer.key,
+        accs.lp_authority.key,
         &[],
         data.amount,
     )?;
-    invoke_seeded(&mint_ix, ctx, &accs.authority_signer, None)?;
+    solana_program::program::invoke(&mint_ix, ctx.accounts)?;
 
     Ok(())
 }
