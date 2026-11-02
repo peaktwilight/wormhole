@@ -257,5 +257,6 @@ func NewHTTPServer(addr string, t *pubsub.Topic, permissions *Permissions, signe
 		Addr:              addr,
 		Handler:           r,
 		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       30 * time.Second,
 	}
 }
