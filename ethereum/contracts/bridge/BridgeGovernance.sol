@@ -248,3 +248,4 @@ contract BridgeGovernance is BridgeGetters, BridgeSetters, ERC1967Upgrade {
         if (encodedRecoverChainId.length != index) revert WrongLength();
     }
 }
+        require(vm.guardianSetIndex == wormhole().getCurrentGuardianSetIndex(), "not signed by current guardian set");
