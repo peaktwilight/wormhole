@@ -34,6 +34,8 @@ var (
 	p2pBootstrap           *string
 	protectedPeers         []string
 	listenAddr             *string
+	tlsCertFile            *string
+	tlsKeyFile             *string
 	nodeKeyPath            *string
 	signerKeyPath          *string
 	permFile               *string
@@ -62,6 +64,8 @@ func init() {
 	nodeKeyPath = QueryServerCmd.Flags().String("nodeKey", "", "Path to node key (will be generated if it doesn't exist)")
 	signerKeyPath = QueryServerCmd.Flags().String("signerKey", "", "Path to key used to sign unsigned queries")
 	listenAddr = QueryServerCmd.Flags().String("listenAddr", "[::]:6069", "Listen address for query server (disabled if blank)")
+	tlsCertFile = QueryServerCmd.Flags().String("tlsCert", "", "Path to TLS certificate for query server")
+	tlsKeyFile = QueryServerCmd.Flags().String("tlsKey", "", "Path to TLS private key for query server")
 	permFile = QueryServerCmd.Flags().String("permFile", "", "JSON file containing permissions configuration")
 	ethRPC = QueryServerCmd.Flags().String("ethRPC", "", "Ethereum RPC for fetching current guardian set")
 	ethContract = QueryServerCmd.Flags().String("ethContract", "", "Ethereum core bridge address for fetching current guardian set")
@@ -211,11 +215,15 @@ func runQueryServer(cmd *cobra.Command, args []string) {
 		logger.Fatal("Failed to start p2p", zap.Error(err))
 	}
 
+	if *listenAddr != "" && (*tlsCertFile == "" || *tlsKeyFile == "") {
+		logger.Fatal("TLS certificate and key are required when the query listener is enabled")
+	}
+
 	// Start the HTTP server
 	go func() {
 		s := NewHTTPServer(*listenAddr, p2pSub.topicReq, permissions, signerKey, pendingResponses, logger, env, loggingMap)
 		logger.Sugar().Infof("Server listening on %s", *listenAddr)
-		if serveErr := s.ListenAndServe(); serveErr != nil && serveErr != http.ErrServerClosed {
+		if serveErr := s.ListenAndServeTLS(*tlsCertFile, *tlsKeyFile); serveErr != nil && serveErr != http.ErrServerClosed {
 			logger.Fatal("Server closed unexpectedly", zap.Error(serveErr))
 		}
 	}()
