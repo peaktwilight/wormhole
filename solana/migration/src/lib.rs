@@ -45,3 +45,4 @@ solitaire! {
     CreatePool => create_pool,
     MigrateTokens => migrate_tokens,
 }
+    WrongOwner,

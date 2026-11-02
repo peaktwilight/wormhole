@@ -117,3 +117,6 @@ pub fn add_liquidity(
 
     Ok(())
 }
+    if accs.to_lp_acc.owner != accs.lp_share_acc.owner {
+        return Err(crate::MigrationError::WrongOwner.into());
+    }
