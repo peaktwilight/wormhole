@@ -142,6 +142,7 @@ pub fn claim_shares(
     to_mint: Pubkey,
     output_token_account: Pubkey,
     lp_share_token_account: Pubkey,
+    lp_authority: Pubkey,
     amount: u64,
 ) -> solitaire::Result<Instruction> {
     let pool = MigrationPool::<'_, { AccountState::Initialized }>::key(
@@ -171,8 +172,8 @@ pub fn claim_shares(
             ),
             AccountMeta::new(output_token_account, false),
             AccountMeta::new(lp_share_token_account, false),
+            AccountMeta::new_readonly(lp_authority, true),
             AccountMeta::new_readonly(CustodySigner::key(None, &program_id), false),
-            AccountMeta::new_readonly(AuthoritySigner::key(None, &program_id), false),
             // Dependencies
             AccountMeta::new(solana_program::sysvar::rent::id(), false),
             AccountMeta::new(solana_program::system_program::id(), false),
