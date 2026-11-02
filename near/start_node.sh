@@ -4,7 +4,7 @@ set -x
 
 echo "starting web server"
 
-python3 -m http.server --directory /tmp/_sandbox 3031 &
+python3 -m http.server --bind 127.0.0.1 --directory /tmp/_sandbox 3031 &
 
 echo "starting near sandbox"
 rm -rf /tmp/_sandbox
